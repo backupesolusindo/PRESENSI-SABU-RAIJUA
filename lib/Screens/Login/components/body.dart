@@ -121,6 +121,7 @@ class _Body extends State<Body> {
                       prefs.setString("Nama", value.Pegawai);
                       prefs.setString("idKampus", value.IDKampus);
                       prefs.setString("Lokasi", value.NamaKampus);
+                      prefs.setString("jab_struktur", value.jab_struktur);
                       prefs.setDouble(
                           "LokasiLat", double.parse(value.LokasiLat));
                       prefs.setDouble(

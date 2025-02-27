@@ -42,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   String jam = "", jam_pulang = "Belum Presensi Pulang", tgl_pulang = "";
   String KeteranganMulai = "", KeteranganSelesai = "";
   String jam_istirahat = "";
+  String jabatanUser = "";
   var DataAbsen,
       DataPegawai,
       DataLokasi,
@@ -56,6 +57,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int AdaTugasBelajar = 0;
   List DataKegiatan = [];
   List ListKegiatan = [];
+  List ListPekerjaan = [];
+  List ListRiwayatPekerjaan = [];
   int statusLoading = 1;
   bool ssHeader = false;
   bool ssBody = false;
@@ -74,6 +77,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     getPref();
     cekFakeGPS();
+    fetchPekerjaan();
+    fetchRiwayatPekerjaan();
     Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
   }
 
@@ -147,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       Foto = DataPegawai["foto_profil"];
 
       prefs.setString("NIP", DataPegawai['NIP']);
-      prefs.setString("Nama", DataPegawai['nama_pegawai']);
+      prefs.setString("Nama", DataPegawai['jab_struktur']);
       prefs.setString("Lokasi", DataLokasi['nama_kampus']);
       LokasiAnda = prefs.getString("Lokasi")!;
       prefs.setString("idKampus", DataLokasi['idkampus']);
@@ -193,6 +198,80 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
     print(resBody);
     return "";
+  }
+
+  fetchRiwayatPekerjaan() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String uuid = prefs.getString("ID") ?? '';
+
+      var url = Uri.parse(
+          'https://presensi-pmi.esolusindo.com/index.php/Api/RiwayatPekerjaan');
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+
+        // Filter berdasarkan id_pg
+        var filteredData =
+            jsonData.where((item) => item['id_pg'].toString() == uuid).toList();
+
+        // Ambil data pekerjaan untuk mendapatkan detail
+        var urlPekerjaan = Uri.parse(
+            'https://presensi-pmi.esolusindo.com/index.php/Api/Pekerjaan');
+        var responsePekerjaan = await http.get(urlPekerjaan);
+        var dataPekerjaan = json.decode(responsePekerjaan.body);
+
+        // Gabungkan data
+        var completeData = filteredData.map((riwayat) {
+          var pekerjaan = dataPekerjaan.firstWhere(
+              (pek) => pek['id_pekerjaan'] == riwayat['id_pk'],
+              orElse: () => null);
+
+          return {...riwayat, 'detail_pekerjaan': pekerjaan};
+        }).toList();
+
+        setState(() {
+          ListRiwayatPekerjaan = completeData;
+        });
+      }
+    } catch (e) {
+      print('Error fetching riwayat: $e');
+    }
+  }
+
+  fetchPekerjaan() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      jabatanUser = prefs.getString("Nama") ?? '';
+      print('Jabatan User: $jabatanUser'); // untuk debug
+
+      var url = Uri.parse(
+          'https://presensi-pmi.esolusindo.com/index.php/Api/Pekerjaan');
+      var response = await http.get(url);
+      print('Response API Pekerjaan: ${response.body}'); // untuk debug
+
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        var filteredData = jsonData
+            .where((item) =>
+                item['id_jb'].toString().toLowerCase() ==
+                jabatanUser.toString().toLowerCase())
+            .toList();
+
+        print('Data Pekerjaan terfilter: $filteredData'); // untuk debug
+
+        setState(() {
+          ListPekerjaan =
+              filteredData; // Ubah ini dari ListKegiatan menjadi ListPekerjaan
+        });
+      }
+    } catch (e) {
+      print('Error: $e');
+      setState(() {
+        ListPekerjaan = []; // Ubah ini dari ListKegiatan menjadi ListPekerjaan
+      });
+    }
   }
 
   fetchKegiatan() async {
@@ -257,6 +336,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   : _buildMenuWFH(screenHeight),
               _buildBox(screenHeight),
               _buildKegiatanTerkini(screenHeight),
+              _buildPekerjaanTerkini(screenHeight),
+              SliverToBoxAdapter(
+                child: _buildRiwayatPekerjaan(),
+              ),
             ],
           ),
         ]),
@@ -265,6 +348,72 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   //box counter
+
+  SliverToBoxAdapter _buildPekerjaanTerkini(double screenHeight) {
+    return SliverToBoxAdapter(
+      child: AnimatedOpacity(
+        opacity: ssFooter ? 1 : 0,
+        duration: const Duration(milliseconds: 500),
+        child: Container(
+          padding: const EdgeInsets.all(0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  // Icon(Icons.work, color: Colors.blue),
+                  SizedBox(width: 10),
+                  Text(
+                    'Daftar Pekerjaan',
+                    style: const TextStyle(
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5),
+              if (ListPekerjaan.isEmpty)
+                Container(
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: Colors.blue.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: Colors.blue),
+                      SizedBox(width: 10),
+                      Text(
+                        'Belum ada pekerjaan saat ini',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Container(
+                  height: 300,
+                  child: ListView.builder(
+                    itemCount: ListPekerjaan.length,
+                    itemBuilder: (context, index) {
+                      return getCardPekerjaan(ListPekerjaan[index]);
+                    },
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   SliverToBoxAdapter _buildBox(double screenHeight) {
     Size size = MediaQuery.of(context).size;
     return SliverToBoxAdapter(
@@ -518,15 +667,275 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     ),
                   Container(
                       width: double.infinity,
-                      height: size.height * 0.3,
+                      height: ListKegiatan.isEmpty
+                          ? 80
+                          : size.height * 0.2, // Sesuaikan height
                       child: ListView.builder(
                           itemCount: ListKegiatan.length,
                           itemBuilder: (context, index) {
                             return getCardKegiatan(ListKegiatan[index]);
-                          }))
+                          })),
+                  SizedBox(height: 10), // Tambahkan spacing di bawah
                 ],
               ),
             )));
+  }
+
+  Widget getCardPekerjaan(item) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+      child: Padding(
+        padding: EdgeInsets.all(15),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Pekerjaan",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    item['nama_pekerjaan'],
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    "Point: ${item['point']}",
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: () => updateStatusPekerjaan(item['id_pekerjaan']),
+              icon: Icon(Icons.add_circle_outline),
+              color: Colors.red,
+              iconSize: 30,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> updateRiwayatPekerjaan(
+      String idRiwayat, String idPk, String tipe) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String uuid = prefs.getString("ID") ?? '';
+
+      if (tipe == "0") {
+        // Langsung update status tanpa input jumlah
+        var url = Uri.parse(
+            'https://presensi-pmi.esolusindo.com/index.php/Api/RiwayatPekerjaan/update/$idRiwayat');
+        var response = await http.post(url,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: json.encode({
+              "id_pk": idPk,
+              "id_pg": uuid,
+              "jumlah": "0",
+              "status": "complete"
+            }));
+
+        print('Response update tanpa jumlah: ${response.body}');
+
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Status berhasil diupdate')));
+          fetchRiwayatPekerjaan();
+        }
+      } else {
+        // Tampilkan dialog input jumlah
+        TextEditingController jumlahController = TextEditingController();
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Masukkan Jumlah'),
+              content: TextField(
+                controller: jumlahController,
+                decoration: InputDecoration(
+                  labelText: 'Jumlah',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Batal'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (jumlahController.text.isNotEmpty) {
+                      Navigator.pop(context);
+
+                      var url = Uri.parse(
+                          'https://presensi-pmi.esolusindo.com/index.php/Api/RiwayatPekerjaan/update/$idRiwayat');
+                      var response = await http.post(url,
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: json.encode({
+                            "id_pk": idPk,
+                            "id_pg": uuid,
+                            "jumlah": jumlahController.text,
+                            "status": "complete"
+                          }));
+
+                      print('Response update dengan jumlah: ${response.body}');
+
+                      if (response.statusCode == 200) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Status berhasil diupdate')));
+                        fetchRiwayatPekerjaan();
+                      }
+                    }
+                  },
+                  child: Text('Simpan'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      print('Error updating riwayat: $e');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Gagal mengupdate status')));
+    }
+  }
+
+  Future<void> updateStatusPekerjaan(String idPekerjaan) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String uuid = prefs.getString("ID") ?? '';
+
+      var data = {
+        "id_pk": idPekerjaan,
+        "id_pg": uuid,
+        "jumlah": "0", // Set default ke "0"
+        "status": "pending"
+      };
+
+      print('Data yang akan dikirim: $data');
+
+      var url = Uri.parse(
+          'https://presensi-pmi.esolusindo.com/index.php/Api/RiwayatPekerjaan/store');
+      var response = await http.post(url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: json.encode(data));
+
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+
+        if (jsonResponse.containsKey('error')) {
+          throw Exception(jsonResponse['error']);
+        }
+
+        // Tampilkan snackbar sebagai feedback
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Pekerjaan berhasil ditambahkan'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Refresh data
+        fetchPekerjaan(); // Ganti fetchKegiatan menjadi fetchPekerjaan
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menambahkan pekerjaan'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Widget _buildRiwayatPekerjaan() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Pekerjaan Yang Diambil',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 15),
+          if (ListRiwayatPekerjaan.isEmpty)
+            Container(
+              padding: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text('Belum ada pekerjaan yang diambil'),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: ListRiwayatPekerjaan.length,
+              itemBuilder: (context, index) {
+                var item = ListRiwayatPekerjaan[index];
+                var pekerjaan = item['detail_pekerjaan'];
+
+                return Card(
+                  margin: EdgeInsets.only(bottom: 10),
+                  child: ListTile(
+                    title: Text(pekerjaan['nama_pekerjaan'] ?? ''),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Status: ${item['status']}'),
+                        Text('Jumlah: ${item['jumlah']}'),
+                      ],
+                    ),
+                    trailing: (item['status'] != 'complete')
+                        ? ElevatedButton(
+                            onPressed: () => updateRiwayatPekerjaan(
+                                item['id'].toString(), // ID Riwayat untuk URL
+                                item['id_pk'], // ID Pekerjaan untuk body
+                                pekerjaan['tipe_pekerjaan']),
+                            child: Text('Selesaikan'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
+                          )
+                        : null,
+                  ),
+                );
+              },
+            )
+        ],
+      ),
+    );
   }
 
   Widget getCardKegiatan(item) {
