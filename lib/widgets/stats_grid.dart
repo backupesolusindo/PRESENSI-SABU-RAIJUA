@@ -65,6 +65,21 @@ class _StatsGridState extends State<StatsGrid> {
       height: MediaQuery.of(context).size.height,
       child: Column(
         children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(
+                left: 12.0, top: 40.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Statistik Presensi',
+                style: TextStyle(
+                  color: CText,
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           Flexible(
             child: Row(
               children: <Widget>[

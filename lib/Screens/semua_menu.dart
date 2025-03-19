@@ -17,6 +17,7 @@ import 'package:mobile_presensi_kdtg/Screens/Kegiatan/ListKegiatan_screen.dart';
 import 'package:mobile_presensi_kdtg/Screens/Laporan/Kegiatan/Laporan_Kegiatan_screen.dart';
 import 'package:mobile_presensi_kdtg/Screens/Laporan/Lembur/Laporan_Lembur_screen.dart';
 import 'package:mobile_presensi_kdtg/Screens/Laporan/LuarJam/Laporan_LuarJam_screen.dart';
+import 'package:mobile_presensi_kdtg/Screens/Laporan/Pekerjaan/Laporan_Pekerjaan_screen.dart';
 import 'package:mobile_presensi_kdtg/Screens/Laporan/Perizinan/Laporan_Perizinan_screen.dart';
 import 'package:mobile_presensi_kdtg/Screens/Laporan/Presensi/Laporan_Presensi_screen.dart';
 import 'package:mobile_presensi_kdtg/Screens/Lembur/ListLembur_screen.dart';
@@ -130,7 +131,7 @@ class _SemuaMenu extends State<SemuaMenu> {
         slivers: <Widget>[
           _presensi(screenHeight),
           _perijinan(screenHeight),
-          _Laporan(screenHeight),
+          _Laporan(screenHeight,context),
           _profileUser(screenHeight),
         ],
       ),
@@ -590,10 +591,177 @@ class _SemuaMenu extends State<SemuaMenu> {
   }
 
   // Menu Laporan
-  SliverToBoxAdapter _Laporan(double screenHeight) {
+  // SliverToBoxAdapter _Laporan(double screenHeight) {
+  //   return SliverToBoxAdapter(
+  //     child: Container(
+  //       padding: const EdgeInsets.only(left: 15.0, top: 25.0),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: <Widget>[
+  //           OrDivider(),
+  //           Text(
+  //             'Menu Laporan',
+  //             style: const TextStyle(
+  //               fontSize: 15.0,
+  //               color: Colors.lightBlue,
+  //               fontWeight: FontWeight.w600,
+  //             ),
+  //           ),
+  //           const SizedBox(height: 10.0),
+  //           Wrap(
+  //               alignment: WrapAlignment.center,
+  //               spacing: 10.0, // Jarak antar item dalam satu baris
+  //               runSpacing: 10.0, // Jarak antar baris jika turun
+  //               children: <Widget>[
+  //                 Container(
+  //                     width: width_menu,
+  //                     child: TextButton(
+  //                         onPressed: () {
+  //                           Navigator.push(context,
+  //                               MaterialPageRoute(builder: (context) {
+  //                             return LaporanCutiScreen();
+  //                           }));
+  //                         },
+  //                         // minWidth: 0,
+  //                         child: Column(
+  //                           children: <Widget>[
+  //                             Image.asset(
+  //                               "assets/icons/laporan_perijinan.png",
+  //                               height: screenHeight * 0.07,
+  //                             ),
+  //                             SizedBox(height: screenHeight * 0.003),
+  //                             Text(
+  //                               "Laporan\nCuti",
+  //                               style: const TextStyle(
+  //                                 fontSize: 11.0,
+  //                                 fontWeight: FontWeight.w500,
+  //                               ),
+  //                               textAlign: TextAlign.center,
+  //                             )
+  //                           ],
+  //                         ))),
+  //                 Container(
+  //                     width: width_menu,
+  //                     child: TextButton(
+  //                         onPressed: () {
+  //                           Navigator.push(context,
+  //                               MaterialPageRoute(builder: (context) {
+  //                             return LaporanPresensiScreen();
+  //                           }));
+  //                         },
+  //                         // minWidth: 0,
+  //                         child: Column(
+  //                           children: <Widget>[
+  //                             Image.asset(
+  //                               "assets/icons/laporan_presensi.png",
+  //                               height: screenHeight * 0.07,
+  //                             ),
+  //                             SizedBox(height: screenHeight * 0.003),
+  //                             Text(
+  //                               "Laporan\nPresensi",
+  //                               style: const TextStyle(
+  //                                 fontSize: 11.0,
+  //                                 fontWeight: FontWeight.w500,
+  //                               ),
+  //                               textAlign: TextAlign.center,
+  //                             )
+  //                           ],
+  //                         ))),
+  //                 Container(
+  //                     width: width_menu,
+  //                     child: TextButton(
+  //                         onPressed: () {
+  //                           Navigator.push(context,
+  //                               MaterialPageRoute(builder: (context) {
+  //                             return LaporanKegiatanScreen();
+  //                           }));
+  //                         },
+  //                         // minWidth: 0,
+  //                         child: Column(
+  //                           children: <Widget>[
+  //                             Image.asset(
+  //                               "assets/icons/laporan_kegiatan.png",
+  //                               height: screenHeight * 0.07,
+  //                             ),
+  //                             SizedBox(height: screenHeight * 0.003),
+  //                             Text(
+  //                               "Laporan\nKegiatan",
+  //                               style: const TextStyle(
+  //                                 fontSize: 11.0,
+  //                                 fontWeight: FontWeight.w500,
+  //                               ),
+  //                               textAlign: TextAlign.center,
+  //                             )
+  //                           ],
+  //                         ))),
+  //                 Container(
+  //                     width: width_menu,
+  //                     child: TextButton(
+  //                         onPressed: () {
+  //                           Navigator.push(context,
+  //                               MaterialPageRoute(builder: (context) {
+  //                             return LaporanLemburScreen();
+  //                           }));
+  //                         },
+  //                         // minWidth: 0,
+  //                         child: Column(
+  //                           children: <Widget>[
+  //                             Image.asset(
+  //                               "assets/icons/kerja_luar.png",
+  //                               height: screenHeight * 0.07,
+  //                             ),
+  //                             SizedBox(height: screenHeight * 0.003),
+  //                             Text(
+  //                               "Laporan\nLembur",
+  //                               style: const TextStyle(
+  //                                 fontSize: 11.0,
+  //                                 fontWeight: FontWeight.w500,
+  //                               ),
+  //                               textAlign: TextAlign.center,
+  //                             )
+  //                           ],
+  //                         ))),
+  //                 Container(
+  //                     width: width_menu,
+  //                     child: TextButton(
+  //                         onPressed: () {
+  //                           Navigator.push(context,
+  //                               MaterialPageRoute(builder: (context) {
+  //                             return LaporanPekerjaanScreen();
+  //                           }));
+  //                         },
+  //                         // minWidth: 0,
+  //                         child: Column(
+  //                           children: <Widget>[
+  //                             Image.asset(
+  //                               "assets/icons/laporan_presensi.png",
+  //                               height: screenHeight * 0.07,
+  //                             ),
+  //                             SizedBox(height: screenHeight * 0.003),
+  //                             Text(
+  //                               "Laporan\nPekerjaan",
+  //                               style: const TextStyle(
+  //                                 fontSize: 11.0,
+  //                                 fontWeight: FontWeight.w500,
+  //                               ),
+  //                               textAlign: TextAlign.center,
+  //                             )
+  //                           ],
+  //                         ))),
+  //               ]),
+  //           const SizedBox(height: 10.0),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  SliverToBoxAdapter _Laporan(double screenHeight, BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return SliverToBoxAdapter(
-      child: Container(
-        padding: const EdgeInsets.only(left: 15.0, top: 25.0),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15.0, top: 25.0, right: 15.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -607,122 +775,80 @@ class _SemuaMenu extends State<SemuaMenu> {
               ),
             ),
             const SizedBox(height: 10.0),
-            Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
-              Container(
-                  width: width_menu,
-                  child: TextButton(
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return LaporanCutiScreen();
-                        }));
-                      },
-                      // minWidth: 0,
-                      child: Column(
-                        children: <Widget>[
-                          Image.asset(
-                            "assets/icons/laporan_perijinan.png",
-                            height: screenHeight * 0.07,
-                          ),
-                          SizedBox(height: screenHeight * 0.003),
-                          Text(
-                            "Laporan\nCuti",
-                            style: const TextStyle(
-                              fontSize: 11.0,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
-                      ))),
-              Container(
-                  width: width_menu,
-                  child: TextButton(
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return LaporanPresensiScreen();
-                        }));
-                      },
-                      // minWidth: 0,
-                      child: Column(
-                        children: <Widget>[
-                          Image.asset(
-                            "assets/icons/laporan_presensi.png",
-                            height: screenHeight * 0.07,
-                          ),
-                          SizedBox(height: screenHeight * 0.003),
-                          Text(
-                            "Laporan\nPresensi",
-                            style: const TextStyle(
-                              fontSize: 11.0,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
-                      ))),
-              Container(
-                  width: width_menu,
-                  child: TextButton(
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return LaporanKegiatanScreen();
-                        }));
-                      },
-                      // minWidth: 0,
-                      child: Column(
-                        children: <Widget>[
-                          Image.asset(
-                            "assets/icons/laporan_kegiatan.png",
-                            height: screenHeight * 0.07,
-                          ),
-                          SizedBox(height: screenHeight * 0.003),
-                          Text(
-                            "Laporan\nKegiatan",
-                            style: const TextStyle(
-                              fontSize: 11.0,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
-                      ))),
-              Container(
-                  width: width_menu,
-                  child: TextButton(
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return LaporanLemburScreen();
-                        }));
-                      },
-                      // minWidth: 0,
-                      child: Column(
-                        children: <Widget>[
-                          Image.asset(
-                            "assets/icons/kerja_luar.png",
-                            height: screenHeight * 0.07,
-                          ),
-                          SizedBox(height: screenHeight * 0.003),
-                          Text(
-                            "Laporan\nLembur",
-                            style: const TextStyle(
-                              fontSize: 11.0,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
-                      ))),
-            ]),
+            GridView.builder(
+              shrinkWrap: true, // Agar tidak mengambil seluruh halaman
+              physics:
+                  NeverScrollableScrollPhysics(), // Supaya scroll mengikuti parent
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4, // Maksimal 4 kolom per baris
+                crossAxisSpacing: 10.0, // Jarak horizontal antar item
+                mainAxisSpacing: 10.0, // Jarak vertikal antar baris
+                childAspectRatio: 1, // Agar tampilan lebih proporsional
+              ),
+              itemCount: menuItems.length,
+              itemBuilder: (context, index) {
+                return TextButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return menuItems[index]['screen'];
+                    }));
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Image.asset(
+                        menuItems[index]['icon'],
+                        height: screenHeight * 0.07,
+                      ),
+                      SizedBox(height: screenHeight * 0.003),
+                      Text(
+                        menuItems[index]['label'],
+                        style: const TextStyle(
+                          fontSize: 11.0,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 10.0),
           ],
         ),
       ),
     );
   }
+
+  final List<Map<String, dynamic>> menuItems = [
+    {
+      'label': 'Laporan\nCuti',
+      'icon': 'assets/icons/laporan_perijinan.png',
+      'screen': LaporanCutiScreen(),
+    },
+    {
+      'label': 'Laporan\nPresensi',
+      'icon': 'assets/icons/laporan_presensi.png',
+      'screen': LaporanPresensiScreen(),
+    },
+    {
+      'label': 'Laporan\nKegiatan',
+      'icon': 'assets/icons/laporan_kegiatan.png',
+      'screen': LaporanKegiatanScreen(),
+    },
+    {
+      'label': 'Laporan\nLembur',
+      'icon': 'assets/icons/kerja_luar.png',
+      'screen': LaporanLemburScreen(),
+    },
+    {
+      'label': 'Laporan\nPekerjaan',
+      'icon': 'assets/icons/laporan_presensi.png',
+      'screen': LaporanPekerjaanScreen(),
+    },
+  ];
 
   // Menu profil user
   SliverToBoxAdapter _profileUser(double screenHeight) {

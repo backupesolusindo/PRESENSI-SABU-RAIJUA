@@ -39,43 +39,77 @@ class _StatsScreenState extends State<StatsScreen> {
       if (uuid == null) return;
 
       var url = Uri.parse(
-          'https://presensi-pmi.esolusindo.com/index.php/Api/RiwayatPekerjaan');
-      var response = await http.get(url);
+          'https://presensi-pmi.esolusindo.com/index.php/Api/riwayatPekerjaan/get_riwayat');
+      var response = await http.post(
+          // Ubah ke POST
+          url,
+          body: {"pegawai_idpegawai": uuid});
+
+      print("Response: ${response.body}"); // Untuk debugging
 
       if (response.statusCode == 200) {
-        var jsonData = json.decode(response.body) as List;
+        var jsonResponse = json.decode(response.body);
 
-        // Filter data berdasarkan uuid
-        var filteredData =
-            jsonData.where((item) => item['id_pg'].toString() == uuid).toList();
+        if (jsonResponse['status'] == 200 && jsonResponse['data'] != null) {
+          var jsonData = jsonResponse['data'] as List;
 
-        // Hitung jumlah masing-masing status
-        Map<String, int> tempCount = {
-          'pending': 0,
-          'complete': 0,
-          'approve': 0,
-          'reject': 0
-        };
+          // Filter data berdasarkan uuid
+          var filteredData = jsonData
+              .where((item) => item['pegawai_idpegawai'].toString() == uuid)
+              .toList();
 
-        for (var item in filteredData) {
-          String status = item['status'].toString().toLowerCase();
-          tempCount[status] = (tempCount[status] ?? 0) + 1;
-        }
+          print("Filtered Data: $filteredData"); // Untuk debugging
 
-        if (mounted) {
-          setState(() {
-            statusCount = tempCount;
-            isLoading = false;
-          });
+          // Hitung jumlah masing-masing status
+          Map<String, int> tempCount = {
+            'pending': 0,
+            'complete': 0,
+            'approve': 0,
+            'reject': 0
+          };
+
+          for (var item in filteredData) {
+            String status = item['status'].toString().toLowerCase();
+            if (tempCount.containsKey(status)) {
+              tempCount[status] = (tempCount[status] ?? 0) + 1;
+            }
+          }
+
+          print("Status Count: $tempCount"); // Untuk debugging
+
+          if (mounted) {
+            setState(() {
+              statusCount = tempCount;
+              isLoading = false;
+            });
+          }
+        } else {
+          if (mounted) {
+            setState(() {
+              statusCount = {
+                'pending': 0,
+                'complete': 0,
+                'approve': 0,
+                'reject': 0
+              };
+              isLoading = false;
+            });
+          }
         }
       }
     } catch (e) {
+      print('Error fetching data: $e'); // Untuk debugging
       if (mounted) {
         setState(() {
+          statusCount = {
+            'pending': 0,
+            'complete': 0,
+            'approve': 0,
+            'reject': 0
+          };
           isLoading = false;
         });
       }
-      debugPrint('Error fetching data: $e');
     }
   }
 
@@ -109,12 +143,12 @@ class _StatsScreenState extends State<StatsScreen> {
 
     return SliverToBoxAdapter(
       child: Container(
-        height: 300, // Kurangi height dari 400
-        padding: const EdgeInsets.all(15), // Kurangi padding
+        height: 300,
+        padding: const EdgeInsets.all(15),
         margin: const EdgeInsets.only(
           left: 20,
           right: 20,
-          top: 5, // Kurangi margin top
+          top: 5,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -131,14 +165,20 @@ class _StatsScreenState extends State<StatsScreen> {
         child: Column(
           children: [
             const Text(
-              'Status Pekerjaan',
+              'Statistik Pekerjaan',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 20),
-            if (total > 0) // Hanya tampilkan chart jika ada data
+            if (isLoading)
+              const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else if (total > 0)
               Expanded(
                 child: Row(
                   children: [
@@ -149,54 +189,58 @@ class _StatsScreenState extends State<StatsScreen> {
                           sectionsSpace: 2,
                           centerSpaceRadius: 40,
                           sections: [
-                            PieChartSectionData(
-                              color: Colors.orange,
-                              value: statusCount['pending']?.toDouble() ?? 0,
-                              title:
-                                  '${((statusCount['pending'] ?? 0) / total * 100).toStringAsFixed(1)}%',
-                              radius: 50,
-                              titleStyle: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                            if (statusCount['pending']! > 0)
+                              PieChartSectionData(
+                                color: Colors.orange,
+                                value: statusCount['pending']?.toDouble() ?? 0,
+                                title:
+                                    '${((statusCount['pending'] ?? 0) / total * 100).toStringAsFixed(1)}%',
+                                radius: 50,
+                                titleStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                            PieChartSectionData(
-                              color: Colors.blue,
-                              value: statusCount['complete']?.toDouble() ?? 0,
-                              title:
-                                  '${((statusCount['complete'] ?? 0) / total * 100).toStringAsFixed(1)}%',
-                              radius: 50,
-                              titleStyle: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                            if (statusCount['complete']! > 0)
+                              PieChartSectionData(
+                                color: Colors.blue,
+                                value: statusCount['complete']?.toDouble() ?? 0,
+                                title:
+                                    '${((statusCount['complete'] ?? 0) / total * 100).toStringAsFixed(1)}%',
+                                radius: 50,
+                                titleStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                            PieChartSectionData(
-                              color: Colors.green,
-                              value: statusCount['approve']?.toDouble() ?? 0,
-                              title:
-                                  '${((statusCount['approve'] ?? 0) / total * 100).toStringAsFixed(1)}%',
-                              radius: 50,
-                              titleStyle: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                            if (statusCount['approve']! > 0)
+                              PieChartSectionData(
+                                color: Colors.green,
+                                value: statusCount['approve']?.toDouble() ?? 0,
+                                title:
+                                    '${((statusCount['approve'] ?? 0) / total * 100).toStringAsFixed(1)}%',
+                                radius: 50,
+                                titleStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                            PieChartSectionData(
-                              color: Colors.red,
-                              value: statusCount['reject']?.toDouble() ?? 0,
-                              title:
-                                  '${((statusCount['reject'] ?? 0) / total * 100).toStringAsFixed(1)}%',
-                              radius: 50,
-                              titleStyle: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                            if (statusCount['reject']! > 0)
+                              PieChartSectionData(
+                                color: Colors.red,
+                                value: statusCount['reject']?.toDouble() ?? 0,
+                                title:
+                                    '${((statusCount['reject'] ?? 0) / total * 100).toStringAsFixed(1)}%',
+                                radius: 50,
+                                titleStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
                           ],
                         ),
                       ),
@@ -245,7 +289,7 @@ class _StatsScreenState extends State<StatsScreen> {
           EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0, top: 40.0),
       sliver: SliverToBoxAdapter(
         child: Text(
-          'Statistik Presensi',
+          'Statistik Pekerjaan',
           style: TextStyle(
             color: CText,
             fontSize: 25.0,
@@ -285,18 +329,18 @@ class _StatsScreenState extends State<StatsScreen> {
             physics: const ClampingScrollPhysics(),
             slivers: <Widget>[
               _buildHeader(),
+              _buildStatisticPie(),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 sliver: SliverToBoxAdapter(
-                  child: StatsGrid(),
+                   child: StatsGrid(),
                 ),
               ),
               if (isLoading)
                 const SliverToBoxAdapter(
                   child: Center(child: CircularProgressIndicator()),
                 )
-              else
-                _buildStatisticPie(), // Hapus SliverPadding di sini
+              
             ],
           ),
         ],
