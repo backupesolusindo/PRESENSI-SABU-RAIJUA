@@ -58,3 +58,6 @@ web/.packages
 *.class
 *.sublime-workspace
 *.sublime-project
+
+# FVM Version Cache
+.fvm/

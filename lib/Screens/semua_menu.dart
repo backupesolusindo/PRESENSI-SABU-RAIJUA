@@ -761,7 +761,7 @@ class _SemuaMenu extends State<SemuaMenu> {
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.only(left: 15.0, top: 25.0, right: 15.0),
+        padding: const EdgeInsets.only(left: 10, top: 0, right: 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -774,15 +774,15 @@ class _SemuaMenu extends State<SemuaMenu> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 10.0),
+            const SizedBox(height: 0),
             GridView.builder(
               shrinkWrap: true, // Agar tidak mengambil seluruh halaman
               physics:
                   NeverScrollableScrollPhysics(), // Supaya scroll mengikuti parent
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4, // Maksimal 4 kolom per baris
-                crossAxisSpacing: 10.0, // Jarak horizontal antar item
-                mainAxisSpacing: 10.0, // Jarak vertikal antar baris
+                crossAxisSpacing: 0, // Jarak horizontal antar item
+                mainAxisSpacing: 0, // Jarak vertikal antar baris
                 childAspectRatio: 1, // Agar tampilan lebih proporsional
               ),
               itemCount: menuItems.length,
@@ -815,7 +815,7 @@ class _SemuaMenu extends State<SemuaMenu> {
                 );
               },
             ),
-            const SizedBox(height: 10.0),
+            const SizedBox(height: 0),
           ],
         ),
       ),
@@ -995,7 +995,7 @@ class _SemuaMenu extends State<SemuaMenu> {
                         child: Column(
                           children: <Widget>[
                             Image.asset(
-                              "assets/icons/atur-kamera.png",
+                              "assets/icons/atur-camera.png",
                               height: screenHeight * 0.06,
                             ),
                             SizedBox(height: screenHeight * 0.003),

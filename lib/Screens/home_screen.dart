@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool isLoading = false;
   String NIP = "", Nama = "", UUID = "";
   String LokasiAnda = "Pilih Lokasi Anda Sekarang";
-  String Foto = "desain/POLIJE_mini.png";
+  String Foto = "desain/logo.png";
   String jam = "", jam_pulang = "Belum Presensi Pulang", tgl_pulang = "";
   String KeteranganMulai = "", KeteranganSelesai = "";
   String jam_istirahat = "";
@@ -633,26 +633,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ),
               ),
               // Tambahkan loading indicator jika sedang loading
-              if (isLoading)
-                Container(
-                  color: Colors.black26,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(kPrimaryColor),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          "Memuat data...",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              // if (isLoading)
+              //   Container(
+              //     color: Colors.black26,
+              //     child: Center(
+              //       child: Column(
+              //         mainAxisAlignment: MainAxisAlignment.center,
+              //         children: [
+              //           CircularProgressIndicator(
+              //             valueColor:
+              //                 AlwaysStoppedAnimation<Color>(kPrimaryColor),
+              //           ),
+              //           SizedBox(height: 16),
+              //           Text(
+              //             "Memuat data...",
+              //             style: TextStyle(color: Colors.white),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
               CustomScrollView(
                 physics: AlwaysScrollableScrollPhysics(),
                 slivers: <Widget>[
@@ -667,13 +667,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         : SizedBox(),
                   ),
                   (statusWF == 1)
-                  
                       ? _buildMenuWFO(screenHeight)
                       : _buildMenuWFH(screenHeight),
-                      _buildPointAndRiwayat(screenHeight),
+                  _buildPointAndRiwayat(screenHeight),
                   _buildBox(screenHeight),
                   _buildKegiatanTerkini(screenHeight),
-                  
                 ],
               ),
             ],
@@ -759,7 +757,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       ),
                       SizedBox(height: 5),
                       Text(
-                      totalPoint['nama_pegawai'] ?? '',
+                        totalPoint['nama_pegawai'] ?? '',
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
@@ -1319,7 +1317,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(50),
                           image: DecorationImage(
-                              image: NetworkImage(Core().Url + Foto)),
+                            fit: BoxFit.cover,
+                            image: Foto.isNotEmpty && Foto.startsWith('http')
+                                ? NetworkImage(Core().Url + Foto)
+                                    as ImageProvider
+                                : AssetImage('assets/images/logo.png')
+                                    as ImageProvider,
+                          ),
                         ),
                       ),
                       SizedBox(
