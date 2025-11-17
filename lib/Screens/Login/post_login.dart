@@ -13,6 +13,7 @@ class PostLogin {
   String UUID;
   String IDKampus, NamaKampus;
   String LokasiLat, LokasiLng, Radius;
+  String jab_struktur;  // Tambahkan field ini
 
   PostLogin(
       {this.status_kode = 0,
@@ -25,9 +26,12 @@ class PostLogin {
       this.LokasiLng = "",
       this.Radius = "",
       this.IDKampus = "",
-      this.NamaKampus = ""});
+      this.NamaKampus = "",
+      this.jab_struktur = ""});  // Tambahkan parameter ini
 
   factory PostLogin.createPostLogin(Map<String, dynamic> object) {
+    print("Response data: ${object['response']}"); // untuk debug response
+    
     return PostLogin(
       status_kode: object['message']['status'],
       message: object['message']['message'],
@@ -40,11 +44,7 @@ class PostLogin {
       Pegawai: object['response']["nama"],
       UUID: object['response']["uuid"],
       status_spesial: object['response']["spesial"].toString(),
-      // status_kode: 200,
-      // message: object['data']['first_name'],
-      // NIP: object['data']["first_name"],
-      // Pegawai: object['data']["first_name"],
-      // UUID: object['data']["first_name"],
+      jab_struktur: object['response']["jab_struktur"] ?? "",  // Tambahkan ini
     );
   }
 
@@ -56,9 +56,9 @@ class PostLogin {
       "password": password,
       "token": token,
     });
-    // var url = Uri.parse("https://reqres.in/api/users/2");
-    // var apiResult = await http.get(url);
-    print(apiResult.body);
+    
+    print("API Response: ${apiResult.body}"); // untuk debug response API
+    
     if (apiResult.statusCode == 200) {
       var jsonObject = json.decode(apiResult.body);
       return PostLogin.createPostLogin(jsonObject);

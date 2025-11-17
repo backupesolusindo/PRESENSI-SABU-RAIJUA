@@ -1,9 +1,25 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
+import 'package:flutter/services.dart';
+import 'riwayat_pekerjaan_screen.dart';
 
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import '../constants.dart';
+import '../config/palette.dart';
+import '../core.dart';
+
+import 'package:date_format/date_format.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:mobile_presensi_kdtg/Screens/daftar_pekerjaan_screen.dart';
+import 'package:mobile_presensi_kdtg/Screens/home_screen.dart';
+import 'package:mobile_presensi_kdtg/Screens/riwayat_pekerjaan_screen.dart';
+import 'package:mobile_presensi_kdtg/Screens/stats_screen.dart';
 import 'package:mobile_presensi_kdtg/Screens/Absen/Harian/absen_harian_screen.dart';
 import 'package:mobile_presensi_kdtg/Screens/Absen/Harian/absen_pulang_harian_screen.dart';
 import 'package:mobile_presensi_kdtg/Screens/Absen/Istirahat/absen_istirahat_screen.dart';
@@ -35,10 +51,19 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+final StreamController<List> _riwayatController =
+    StreamController<List>.broadcast();
+
+@override
+void dispose() {
+  _riwayatController.close();
+}
+
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  bool isLoading = false;
   String NIP = "", Nama = "", UUID = "";
   String LokasiAnda = "Pilih Lokasi Anda Sekarang";
-  String Foto = "desain/POLIJE_mini.png";
+  String Foto = "desain/logo.png";
   String jam = "", jam_pulang = "Belum Presensi Pulang", tgl_pulang = "";
   String KeteranganMulai = "", KeteranganSelesai = "";
   String jam_istirahat = "";
@@ -56,25 +81,67 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int AdaTugasBelajar = 0;
   List DataKegiatan = [];
   List ListKegiatan = [];
+  List DataPekerjaan = [];
+  List RiwayatPekerjaan = [];
   int statusLoading = 1;
   bool ssHeader = false;
   bool ssBody = false;
   bool ssFooter = false;
   int status_lintashari = 0;
+  TextEditingController jumlahController = TextEditingController();
+  Map<String, dynamic> totalPoint = {
+    'nama_pegawai': '',
+    'total_point': '0',
+  };
+
+  get refreshAllData => null;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   statusLoading = 1;
+  //   ssHeader = false;
+  //   ssBody = false;
+  //   ssFooter = false;
+  //   WidgetsBinding.instance.addObserver(this);
+  //   getPref();
+  //   cekFakeGPS();
+  //   Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+  // }
 
   @override
   void initState() {
-    // TODO: implement initState
-    // WidgetsBinding.instance.addPostFrameCallback(getPref());
     super.initState();
     statusLoading = 1;
     ssHeader = false;
     ssBody = false;
     ssFooter = false;
     WidgetsBinding.instance.addObserver(this);
-    getPref();
-    cekFakeGPS();
-    Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+    _initializeData(); // Ganti semua pemanggilan fungsi dengan ini
+  }
+
+  Future<void> _initializeData() async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+
+    try {
+      await getPref();
+      await cekFakeGPS();
+      await fetchTotalPoint();
+      await Future.wait([fetchRiwayatPekerjaan(), fetchPekerjaan()]);
+      Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+    } catch (e) {
+      print("Error initializing data: $e");
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   cekFakeGPS() async {
@@ -117,6 +184,321 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     fetchKegiatan();
   }
 
+  Future<void> addPekerjaan(Map pekerjaan) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String uuid = prefs.getString("ID") ?? "";
+
+      var url = Uri.parse(Core().ApiUrl + "RiwayatPekerjaan/store");
+
+      var jsonBody = json.encode({
+        "pekerjaan_idpekerjaan": pekerjaan['id_pekerjaan'].toString(),
+        "pegawai_idpegawai": uuid,
+        "jumlah": "1",
+        "status": "pending"
+      });
+
+      print("JSON Body: $jsonBody");
+
+      var response = await http.post(url,
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: jsonBody);
+
+      print("Response add pekerjaan: ${response.body}");
+      var jsonResponse = json.decode(response.body);
+
+      // Ubah pengecekan status
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Refresh data
+        await fetchRiwayatPekerjaan();
+        await fetchTotalPoint();
+
+        // Update stream dengan data terbaru
+        _riwayatController.add(RiwayatPekerjaan);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisSize: MainAxisSize.min, // Perbaiki overflow
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    jsonResponse['message'] ?? "Berhasil menambahkan pekerjaan",
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Refresh RiwayatPekerjaanScreen
+        if (mounted) {
+          setState(() {});
+        }
+      } else {
+        throw Exception(
+            jsonResponse['message'] ?? "Gagal menambahkan pekerjaan");
+      }
+    } catch (e) {
+      print("Error adding pekerjaan: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisSize: MainAxisSize.min, // Perbaiki overflow
+            children: [
+              Icon(Icons.error_outline, color: Colors.white),
+              SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  "Gagal menambahkan pekerjaan",
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> fetchPekerjaan() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String jabatanUser =
+          prefs.getString("Nama") ?? ""; // mengambil jabatan dari Nama
+      print("Jabatan User: $jabatanUser"); // untuk debugging
+
+      var url = Uri.parse(Core().ApiUrl + "Pekerjaan/get_pekerjaan");
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        setState(() {
+          // filter data sesuai dengan jabatan
+          DataPekerjaan = data['data']
+              .where((item) => item['namajabatan'] == jabatanUser)
+              .toList();
+        });
+        print("Data Pekerjaan Filtered: $DataPekerjaan"); // untuk debugging
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  Future<void> fetchRiwayatPekerjaan() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String uuid = prefs.getString("ID") ?? "";
+
+      print("UUID for riwayat: $uuid"); // debugging
+
+      var url = Uri.parse(Core().ApiUrl + "riwayatPekerjaan/get_riwayat");
+      var response = await http.post(url, body: {"pegawai_idpegawai": uuid});
+
+      print("Response Riwayat: ${response.body}"); // debugging
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        setState(() {
+          // Filter data sesuai dengan UUID
+          RiwayatPekerjaan = (jsonResponse['data'] as List)
+              .where((item) => item['pegawai_idpegawai'] == uuid)
+              .toList();
+          print(
+              "Jumlah Riwayat Filtered: ${RiwayatPekerjaan.length}"); // debugging
+        });
+      }
+    } catch (e) {
+      print("Error fetching riwayat: $e");
+    }
+  }
+
+  Future<void> updateStatusPekerjaan(Map riwayat, String tipePekerjaan) async {
+    try {
+      var jumlah = "1";
+      if (tipePekerjaan == "1") {
+        jumlahController.text = "";
+        bool? shouldContinue = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Masukkan Jumlah"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Masukkan jumlah pekerjaan yang telah diselesaikan:"),
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: jumlahController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: "Masukkan jumlah",
+                      border: OutlineInputBorder(),
+                    ),
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  child: Text("Batal"),
+                  onPressed: () => Navigator.of(context).pop(false),
+                ),
+                TextButton(
+                  child: Text("Simpan"),
+                  onPressed: () {
+                    if (jumlahController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Jumlah harus diisi!"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+
+        if (shouldContinue != true) return;
+        jumlah = jumlahController.text;
+      }
+
+      DateTime now = DateTime.now();
+      String formattedDate =
+          "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
+
+      var requestBody = {
+        "pekerjaan_idpekerjaan": riwayat['pekerjaan_idpekerjaan'],
+        "pegawai_idpegawai": riwayat['pegawai_idpegawai'],
+        "jumlah": jumlah,
+        "status": "complete",
+        "updated_at": formattedDate
+      };
+
+      // Tampilkan snackbar loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              SizedBox(width: 10),
+              Text("Mengupdate status..."),
+            ],
+          ),
+          duration: Duration(seconds: 1),
+          backgroundColor: Colors.blue,
+        ),
+      );
+
+      var url = Uri.parse(Core().ApiUrl +
+          "RiwayatPekerjaan/update/${riwayat['id_riwayatpekerjaan']}");
+      var response = await http.post(url,
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: json.encode(requestBody));
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+
+        if (jsonResponse['status'] == 200) {
+          // Update data lokal
+          setState(() {
+            int index = RiwayatPekerjaan.indexWhere((item) =>
+                item['id_riwayatpekerjaan'] == riwayat['id_riwayatpekerjaan']);
+            if (index != -1) {
+              RiwayatPekerjaan[index] = {
+                ...riwayat,
+                'status': 'complete',
+                'jumlah': jumlah,
+                'updated_at': formattedDate
+              };
+            }
+          });
+
+          // Broadcast update ke stream
+          _riwayatController.add(RiwayatPekerjaan);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 10),
+                  Text("Berhasil mengupdate status pekerjaan"),
+                ],
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print("Error updating status: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.white),
+              SizedBox(width: 10),
+              Text("Gagal mengupdate status pekerjaan"),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> fetchTotalPoint() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String uuid = prefs.getString("ID") ?? "";
+
+      var url = Uri.parse(Core().ApiUrl + "TotalPoint/get_total_poin/$uuid");
+
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        setState(() {
+          totalPoint = {
+            'nama_pegawai': jsonResponse['nama_pegawai'] ?? '',
+            'total_point': jsonResponse['total_point'] ?? '0',
+          };
+        });
+      }
+    } catch (e) {
+      print("Error fetching total point: $e");
+    }
+  }
+
   Future<String> getDataDash() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var res = await http.get(Uri.parse(Core().ApiUrl + "Dash/get_dash/" + UUID),
@@ -147,7 +529,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       Foto = DataPegawai["foto_profil"];
 
       prefs.setString("NIP", DataPegawai['NIP']);
-      prefs.setString("Nama", DataPegawai['nama_pegawai']);
+      prefs.setString("Nama", DataPegawai['jab_struktur']);
       prefs.setString("Lokasi", DataLokasi['nama_kampus']);
       LokasiAnda = prefs.getString("Lokasi")!;
       prefs.setString("idKampus", DataLokasi['idkampus']);
@@ -190,6 +572,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 [HH, ':', nn, ':', ss]) +
             " - Belum Presensi";
       }
+
+      fetchPekerjaan();
+      fetchRiwayatPekerjaan();
     });
     print(resBody);
     return "";
@@ -217,54 +602,264 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     Size size = MediaQuery.of(context).size;
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      // appBar: CustomAppBar(),
-      body: Container(
-        color: CBackground,
-        child: Stack(children: [
-          Positioned(
-            top: 0,
-            right: 0,
-            child: Image.asset(
-              "assets/images/dash_tr.png",
-              height: size.height * 0.4,
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            child: Image.asset(
-              "assets/images/dash_bl.png",
-              // height: size.height * 0.3,
-              width: size.width,
-              fit: BoxFit.fill,
-            ),
-          ),
-          CustomScrollView(
-            physics: ClampingScrollPhysics(),
-            slivers: <Widget>[
-              _buildHeader(screenHeight),
-              SliverToBoxAdapter(
-                child: (statusLoading == 1)
-                    ? Container(
-                        width: size.width,
-                        alignment: Alignment.center,
-                        child: CircularProgressIndicator(),
-                      )
-                    : SizedBox(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Future.wait([
+            fetchPekerjaan(),
+            fetchRiwayatPekerjaan(),
+          ]);
+          setState(() {});
+        },
+        child: Container(
+          color: CBackground,
+          child: Stack(
+            children: [
+              // Background images tetap sama
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Image.asset(
+                  "assets/images/dash_tr.png",
+                  height: size.height * 0.4,
+                ),
               ),
-              (statusWF == 1)
-                  ? _buildMenuWFO(screenHeight)
-                  : _buildMenuWFH(screenHeight),
-              _buildBox(screenHeight),
-              _buildKegiatanTerkini(screenHeight),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                child: Image.asset(
+                  "assets/images/dash_bl.png",
+                  width: size.width,
+                  fit: BoxFit.fill,
+                ),
+              ),
+              // Tambahkan loading indicator jika sedang loading
+              // if (isLoading)
+              //   Container(
+              //     color: Colors.black26,
+              //     child: Center(
+              //       child: Column(
+              //         mainAxisAlignment: MainAxisAlignment.center,
+              //         children: [
+              //           CircularProgressIndicator(
+              //             valueColor:
+              //                 AlwaysStoppedAnimation<Color>(kPrimaryColor),
+              //           ),
+              //           SizedBox(height: 16),
+              //           Text(
+              //             "Memuat data...",
+              //             style: TextStyle(color: Colors.white),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              CustomScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                slivers: <Widget>[
+                  _buildHeader(screenHeight),
+                  SliverToBoxAdapter(
+                    child: (statusLoading == 1)
+                        ? Container(
+                            width: size.width,
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(),
+                          )
+                        : SizedBox(),
+                  ),
+                  (statusWF == 1)
+                      ? _buildMenuWFO(screenHeight)
+                      : _buildMenuWFH(screenHeight),
+                  _buildPointAndRiwayat(screenHeight),
+                  _buildBox(screenHeight),
+                  _buildKegiatanTerkini(screenHeight),
+                ],
+              ),
             ],
           ),
-        ]),
+        ),
       ),
     );
   }
 
   //box counter
+  SliverToBoxAdapter _buildPointAndRiwayat(double screenHeight) {
+    return SliverToBoxAdapter(
+      child: AnimatedOpacity(
+        opacity: ssFooter ? 1 : 0,
+        duration: const Duration(milliseconds: 500),
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          child: Row(
+            children: [
+              // Card Total Point (Kiri)
+              Expanded(
+                flex: 1,
+                child: Container(
+                  height: 180,
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [kPrimaryColor, kPrimaryColor.withOpacity(0.8)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: kPrimaryColor.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.workspace_premium,
+                          color: Colors.amber,
+                          size: 25,
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        'Total Point',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                            size: 24,
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            totalPoint['total_point'] ?? '0',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        totalPoint['nama_pegawai'] ?? '',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(width: 15),
+              // Card Riwayat Pekerjaan (Kanan)
+              Expanded(
+                flex: 1,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RiwayatPekerjaanScreen(
+                          riwayatPekerjaan: RiwayatPekerjaan,
+                          dataPekerjaan: DataPekerjaan,
+                          onUpdateStatus: updateStatusPekerjaan,
+                          onRefresh: () async {
+                            await refreshAllData();
+                          },
+                          streamController: _riwayatController,
+                          onAddPekerjaan: addPekerjaan,
+                        ),
+                      ),
+                    ).then((_) async {
+                      // Refresh data setelah kembali dari RiwayatPekerjaanScreen
+                      await refreshAllData();
+                    });
+                  },
+                  child: Container(
+                    height: 180,
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: kPrimaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.work_history,
+                            color: kPrimaryColor,
+                            size: 25,
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          'Pekerjaan',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          '${RiwayatPekerjaan.length} Pekerjaan',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'Tap untuk detail',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   SliverToBoxAdapter _buildBox(double screenHeight) {
     Size size = MediaQuery.of(context).size;
     return SliverToBoxAdapter(
@@ -518,7 +1113,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     ),
                   Container(
                       width: double.infinity,
-                      height: size.height * 0.3,
+                      height: size.height * 0, //harusnya 0.3
                       child: ListView.builder(
                           itemCount: ListKegiatan.length,
                           itemBuilder: (context, index) {
@@ -722,7 +1317,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(50),
                           image: DecorationImage(
-                              image: NetworkImage(Core().Url + Foto)),
+                            fit: BoxFit.cover,
+                            image: Foto.isNotEmpty && Foto.startsWith('http')
+                                ? NetworkImage(Core().Url + Foto)
+                                    as ImageProvider
+                                : AssetImage('assets/images/logo.png')
+                                    as ImageProvider,
+                          ),
                         ),
                       ),
                       SizedBox(
