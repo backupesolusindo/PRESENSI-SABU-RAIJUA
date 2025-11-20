@@ -24,6 +24,7 @@ class _Body extends State<Body> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -196,6 +197,7 @@ class _Body extends State<Body> with SingleTickerProviderStateMixin {
                             SizedBox(height: 20),
 
                             // Password Field
+                            // Password Field
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -210,7 +212,7 @@ class _Body extends State<Body> with SingleTickerProviderStateMixin {
                               ),
                               child: TextField(
                                 controller: txtPassword,
-                                obscureText: true,
+                                obscureText: _obscurePassword,
                                 style: TextStyle(fontSize: 16),
                                 decoration: InputDecoration(
                                   hintText: "Password",
@@ -222,6 +224,22 @@ class _Body extends State<Body> with SingleTickerProviderStateMixin {
                                     Icons.lock_outline,
                                     color: Color(0xFF3B82F6),
                                   ),
+
+                                  // 👁️ icon show/hide password
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      color: Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
+                                    },
+                                  ),
+
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 20,
