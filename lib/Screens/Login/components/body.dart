@@ -77,10 +77,10 @@ class _Body extends State<Body> with SingleTickerProviderStateMixin {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF1E3A8A), // Biru tua
-              Color(0xFF3B82F6), // Biru medium
-              Color(0xFF60A5FA), // Biru terang
-              Color(0xFFFBBF24), // Kuning
+              Color(0xFF1E3A8A),
+              Color(0xFF3B82F6),
+              Color(0xFF60A5FA),
+              Color(0xFFFBBF24),
             ],
             stops: [0.0, 0.4, 0.7, 1.0],
           ),
@@ -101,7 +101,7 @@ class _Body extends State<Body> with SingleTickerProviderStateMixin {
 
                       // Title
                       Text(
-                        "Member",
+                        "LOGIN",
                         style: TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.w700,
@@ -110,7 +110,7 @@ class _Body extends State<Body> with SingleTickerProviderStateMixin {
                         ),
                       ),
                       Text(
-                        "Sign In",
+                        "E-PRESENSI",
                         style: TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.w700,
@@ -142,8 +142,6 @@ class _Body extends State<Body> with SingleTickerProviderStateMixin {
                       ),
 
                       SizedBox(height: size.height * 0.05),
-
-                      // Card Container
                       Container(
                         padding: EdgeInsets.all(28),
                         decoration: BoxDecoration(
@@ -234,22 +232,6 @@ class _Body extends State<Body> with SingleTickerProviderStateMixin {
                             ),
 
                             SizedBox(height: 12),
-
-                            // Forgot Password
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  "Forgot password?",
-                                  style: TextStyle(
-                                    color: Color(0xFFFBBF24),
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
 
                             SizedBox(height: 8),
 
