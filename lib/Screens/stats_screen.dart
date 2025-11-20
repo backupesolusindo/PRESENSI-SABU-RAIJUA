@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:presensi_sabu_raijua/core.dart';
@@ -33,6 +36,7 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   Future<void> fetchRiwayatPekerjaan() async {
+    debugPrint("fetchRiwayatPekerjaan");
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? uuid = prefs.getString("ID");
@@ -95,6 +99,18 @@ class _StatsScreenState extends State<StatsScreen> {
               isLoading = false;
             });
           }
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            statusCount = {
+              'pending': 0,
+              'complete': 0,
+              'approve': 0,
+              'reject': 0
+            };
+            isLoading = false;
+          });
         }
       }
     } catch (e) {
@@ -165,7 +181,7 @@ class _StatsScreenState extends State<StatsScreen> {
         child: Column(
           children: [
             const Text(
-              'Statistik Pekerjaan',
+              'Grafik Pekerjaan',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -289,10 +305,10 @@ class _StatsScreenState extends State<StatsScreen> {
           EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0, top: 40.0),
       sliver: SliverToBoxAdapter(
         child: Text(
-          'Statistik Pekerjaan',
+          'STATISTIK PEKERJAAN',
           style: TextStyle(
             color: CText,
-            fontSize: 25.0,
+            fontSize: 22.0,
             fontWeight: FontWeight.bold,
           ),
         ),
