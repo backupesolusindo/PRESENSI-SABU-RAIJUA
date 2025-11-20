@@ -4,11 +4,11 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/Profil/upload_post.dart';
-import 'package:mobile_presensi_kdtg/Screens/dashboard_screen.dart';
-import 'package:mobile_presensi_kdtg/components/rounded_button_small.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
-import 'package:mobile_presensi_kdtg/core.dart';
+import 'package:presensi_sabu_raijua/Screens/Profil/upload_post.dart';
+import 'package:presensi_sabu_raijua/Screens/dashboard_screen.dart';
+import 'package:presensi_sabu_raijua/components/rounded_button_small.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
+import 'package:presensi_sabu_raijua/core.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;

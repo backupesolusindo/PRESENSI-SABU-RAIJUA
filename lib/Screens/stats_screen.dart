@@ -1,13 +1,14 @@
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:presensi_sabu_raijua/core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:mobile_presensi_kdtg/config/palette.dart';
-import 'package:mobile_presensi_kdtg/config/styles.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
-import 'package:mobile_presensi_kdtg/widgets/widgets.dart';
+import 'package:presensi_sabu_raijua/config/palette.dart';
+import 'package:presensi_sabu_raijua/config/styles.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
+import 'package:presensi_sabu_raijua/widgets/widgets.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -38,8 +39,7 @@ class _StatsScreenState extends State<StatsScreen> {
 
       if (uuid == null) return;
 
-      var url = Uri.parse(
-          'https://presensi-pmi.esolusindo.com/index.php/Api/riwayatPekerjaan/get_riwayat');
+      var url = Uri.parse(Core().ApiUrl + "riwayatPekerjaan/get_riwayat");
       var response = await http.post(
           // Ubah ke POST
           url,
@@ -333,14 +333,13 @@ class _StatsScreenState extends State<StatsScreen> {
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 sliver: SliverToBoxAdapter(
-                   child: StatsGrid(),
+                  child: StatsGrid(),
                 ),
               ),
               if (isLoading)
                 const SliverToBoxAdapter(
                   child: Center(child: CircularProgressIndicator()),
                 )
-              
             ],
           ),
         ],

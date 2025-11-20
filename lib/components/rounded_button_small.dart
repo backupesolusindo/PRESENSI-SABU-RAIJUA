@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
 
 class RoundedButtonSmall extends StatelessWidget {
   final String text;

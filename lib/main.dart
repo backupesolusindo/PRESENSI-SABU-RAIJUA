@@ -4,16 +4,16 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mobile_presensi_kdtg/Screens/Absen/absen_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Login/login_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Perizinan/izin_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Welcome/welcome_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/dashboard_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/screens.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
+import 'package:presensi_sabu_raijua/Screens/Absen/absen_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Login/login_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Perizinan/izin_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Welcome/welcome_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/dashboard_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/screens.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:trust_location/trust_location.dart';
+//import 'package:trust_location/trust_location.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

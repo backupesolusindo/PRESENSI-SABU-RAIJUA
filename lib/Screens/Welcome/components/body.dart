@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
-import 'package:mobile_presensi_kdtg/Screens/Login/login_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Welcome/components/background.dart';
-import 'package:mobile_presensi_kdtg/components/rounded_button.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
+//import 'package:lottie/lottie.dart';
+import 'package:presensi_sabu_raijua/Screens/Login/login_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Welcome/components/background.dart';
+import 'package:presensi_sabu_raijua/components/rounded_button.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Body extends StatelessWidget {
@@ -26,12 +26,12 @@ class Body extends StatelessWidget {
             ),
             SizedBox(height: size.height * 0.05),
             Container(
-              child: Lottie.asset('assets/lottie/Logo.json'),
-              // child: Image.asset(
-              //   "assets/images/splash_screen.png",
-              //   width: size.width * 0.6, //ukuran gambar
-              // ),
-            ),
+                // child: Lottie.asset('assets/lottie/Logo.json'),
+                // child: Image.asset(
+                //   "assets/images/splash_screen.png",
+                //   width: size.width * 0.6, //ukuran gambar
+                // ),
+                ),
             SizedBox(height: size.height * 0.05),
           ],
         ),

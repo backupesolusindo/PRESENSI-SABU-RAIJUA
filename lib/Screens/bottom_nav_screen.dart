@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/Profil/profil_user.dart';
-import 'package:mobile_presensi_kdtg/Screens/screens.dart';
+import 'package:presensi_sabu_raijua/Screens/Profil/profil_user.dart';
+import 'package:presensi_sabu_raijua/Screens/screens.dart';
 
 class BottomNavScreen extends StatefulWidget {
   @override

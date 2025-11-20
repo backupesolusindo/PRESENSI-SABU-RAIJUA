@@ -2,8 +2,8 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/dashboard_screen.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
+import 'package:presensi_sabu_raijua/Screens/dashboard_screen.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 

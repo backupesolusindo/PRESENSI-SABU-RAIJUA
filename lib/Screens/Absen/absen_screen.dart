@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mobile_presensi_kdtg/Screens/Absen/absen_post.dart';
-import 'package:mobile_presensi_kdtg/Screens/Login/components/body.dart';
-import 'package:mobile_presensi_kdtg/components/rounded_button.dart';
-import 'package:mobile_presensi_kdtg/components/rounded_button_small.dart';
+import 'package:presensi_sabu_raijua/Screens/Absen/absen_post.dart';
+import 'package:presensi_sabu_raijua/Screens/Login/components/body.dart';
+import 'package:presensi_sabu_raijua/components/rounded_button.dart';
+import 'package:presensi_sabu_raijua/components/rounded_button_small.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mobile_presensi_kdtg/components/text_style.dart';
-import 'package:mobile_presensi_kdtg/components/or_divider.dart';
+import 'package:presensi_sabu_raijua/components/text_style.dart';
+import 'package:presensi_sabu_raijua/components/or_divider.dart';
 
 class AbsenScreen extends StatelessWidget {
   @override

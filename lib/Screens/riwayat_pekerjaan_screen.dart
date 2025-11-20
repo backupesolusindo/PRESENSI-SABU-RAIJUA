@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart';
-import 'package:mobile_presensi_kdtg/Screens/daftar_pekerjaan_screen.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
+import 'package:presensi_sabu_raijua/Screens/daftar_pekerjaan_screen.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
 
 class RiwayatPekerjaanScreen extends StatefulWidget {
   final List riwayatPekerjaan;

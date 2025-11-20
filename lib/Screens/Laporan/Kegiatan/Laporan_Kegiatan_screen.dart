@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/Laporan/Kegiatan/components/body.dart';
+import 'package:presensi_sabu_raijua/Screens/Laporan/Kegiatan/components/body.dart';
 
 class LaporanKegiatanScreen extends StatelessWidget {
   @override

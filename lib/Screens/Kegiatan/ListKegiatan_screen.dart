@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/Kegiatan/components/body.dart';
+import 'package:presensi_sabu_raijua/Screens/Kegiatan/components/body.dart';
 
 class ListKegiatanScreen extends StatelessWidget {
   @override

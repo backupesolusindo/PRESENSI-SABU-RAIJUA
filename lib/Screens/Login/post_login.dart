@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/core.dart';
+import 'package:presensi_sabu_raijua/core.dart';
 import 'package:http/http.dart' as http;
 
 class PostLogin {
@@ -13,7 +13,7 @@ class PostLogin {
   String UUID;
   String IDKampus, NamaKampus;
   String LokasiLat, LokasiLng, Radius;
-  String jab_struktur;  // Tambahkan field ini
+  String jab_struktur; // Tambahkan field ini
 
   PostLogin(
       {this.status_kode = 0,
@@ -27,11 +27,11 @@ class PostLogin {
       this.Radius = "",
       this.IDKampus = "",
       this.NamaKampus = "",
-      this.jab_struktur = ""});  // Tambahkan parameter ini
+      this.jab_struktur = ""}); // Tambahkan parameter ini
 
   factory PostLogin.createPostLogin(Map<String, dynamic> object) {
     print("Response data: ${object['response']}"); // untuk debug response
-    
+
     return PostLogin(
       status_kode: object['message']['status'],
       message: object['message']['message'],
@@ -44,7 +44,7 @@ class PostLogin {
       Pegawai: object['response']["nama"],
       UUID: object['response']["uuid"],
       status_spesial: object['response']["spesial"].toString(),
-      jab_struktur: object['response']["jab_struktur"] ?? "",  // Tambahkan ini
+      jab_struktur: object['response']["jab_struktur"] ?? "", // Tambahkan ini
     );
   }
 
@@ -56,9 +56,9 @@ class PostLogin {
       "password": password,
       "token": token,
     });
-    
+
     print("API Response: ${apiResult.body}"); // untuk debug response API
-    
+
     if (apiResult.statusCode == 200) {
       var jsonObject = json.decode(apiResult.body);
       return PostLogin.createPostLogin(jsonObject);

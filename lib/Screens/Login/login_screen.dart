@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/Login/components/body.dart';
+import 'package:presensi_sabu_raijua/Screens/Login/components/body.dart';
 
 class LoginScreen extends StatefulWidget {
   @override

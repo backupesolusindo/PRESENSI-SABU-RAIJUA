@@ -7,15 +7,16 @@ import 'package:camera/camera.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mobile_presensi_kdtg/Screens/Absen/absen_post.dart';
-import 'package:mobile_presensi_kdtg/Screens/dashboard_screen.dart';
-import 'package:mobile_presensi_kdtg/components/rounded_button_small.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
-import 'package:mobile_presensi_kdtg/core.dart';
+import 'package:presensi_sabu_raijua/Screens/Absen/absen_post.dart';
+import 'package:presensi_sabu_raijua/Screens/dashboard_screen.dart';
+import 'package:presensi_sabu_raijua/components/rounded_button_small.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
+import 'package:presensi_sabu_raijua/core.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:trust_location/trust_location.dart';
+import 'package:presensi_sabu_raijua/services/location_services.dart';
+// import 'package:trust_location/trust_location.dart';
 import 'package:http/http.dart' as http;
 
 List<CameraDescription> cameras = [];
@@ -213,7 +214,7 @@ class _AbsenHarianScreenState extends State<AbsenHarianScreen> {
     if (prefs.getBool("sl_harian_masuk")!) {
       _showPerizinan();
     }
-    _isMockLocation = await TrustLocation.isMockLocation;
+    _isMockLocation = await LocationService.isMockLocation;
     print("fake GPS :");
     print(_isMockLocation);
     Nama = prefs.getString("Nama")!;
@@ -577,7 +578,7 @@ class _AbsenHarianScreenState extends State<AbsenHarianScreen> {
                             }
                           } else {
                             _isMockLocation =
-                                await TrustLocation.isMockLocation;
+                                await LocationService.isMockLocation;
                             print("fake GPS :");
                             print(_isMockLocation);
                             if (_isMockLocation == true) {

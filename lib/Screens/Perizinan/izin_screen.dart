@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/Perizinan/components/body.dart';
+import 'package:presensi_sabu_raijua/Screens/Perizinan/components/body.dart';
 
 class IzinScreen extends StatelessWidget {
   @override

@@ -16,32 +16,33 @@ import '../core.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mobile_presensi_kdtg/Screens/daftar_pekerjaan_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/home_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/riwayat_pekerjaan_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/stats_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Absen/Harian/absen_harian_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Absen/Harian/absen_pulang_harian_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Absen/Istirahat/absen_istirahat_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Absen/Istirahat/absen_selesai_istirahat_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Absen/Istirahat/istirahat_post.dart';
-import 'package:mobile_presensi_kdtg/Screens/Absen/absen_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/AktifGPS/aktifgps_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Kegiatan/absen_kegiatan_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/Kegiatan/absen_kegiatan_wfh_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/LokasiKampus/lokasi_kampus_screen.dart';
-import 'package:mobile_presensi_kdtg/Screens/semua_menu.dart';
-import 'package:mobile_presensi_kdtg/config/palette.dart';
-import 'package:mobile_presensi_kdtg/config/styles.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
-import 'package:mobile_presensi_kdtg/core.dart';
-import 'package:mobile_presensi_kdtg/data/data.dart';
-import 'package:mobile_presensi_kdtg/widgets/widgets.dart';
+import 'package:presensi_sabu_raijua/Screens/daftar_pekerjaan_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/home_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/riwayat_pekerjaan_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/stats_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Absen/Harian/absen_harian_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Absen/Harian/absen_pulang_harian_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Absen/Istirahat/absen_istirahat_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Absen/Istirahat/absen_selesai_istirahat_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Absen/Istirahat/istirahat_post.dart';
+import 'package:presensi_sabu_raijua/Screens/Absen/absen_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/AktifGPS/aktifgps_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Kegiatan/absen_kegiatan_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/Kegiatan/absen_kegiatan_wfh_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/LokasiKampus/lokasi_kampus_screen.dart';
+import 'package:presensi_sabu_raijua/Screens/semua_menu.dart';
+import 'package:presensi_sabu_raijua/config/palette.dart';
+import 'package:presensi_sabu_raijua/config/styles.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
+import 'package:presensi_sabu_raijua/core.dart';
+import 'package:presensi_sabu_raijua/data/data.dart';
+import 'package:presensi_sabu_raijua/widgets/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:trust_location/trust_location.dart';
-import 'package:launch_review/launch_review.dart';
+//import 'package:trust_location/trust_location.dart';
+import 'package:presensi_sabu_raijua/services/location_services.dart';
+//import 'package:launch_review/launch_review.dart';
 
 import 'Absen/WorkFrom/absen_selesai_wf_screen.dart';
 import 'Absen/WorkFrom/absen_wf_screen.dart';
@@ -145,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   cekFakeGPS() async {
-    bool _isMockLocation = await TrustLocation.isMockLocation;
+    bool _isMockLocation = await LocationService.isMockLocation;
     print("fake GPS :");
     print(_isMockLocation);
   }
@@ -490,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         setState(() {
           totalPoint = {
             'nama_pegawai': jsonResponse['nama_pegawai'] ?? '',
-            'total_point': jsonResponse['total_point'] ?? '0',
+            'total_point': jsonResponse['total_point'].toString() ?? '0',
           };
         });
       }
@@ -545,15 +546,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         status_lintashari =
             int.parse(resBody['data']["jabatan"]["lintas_hari"]);
       }
-
-      if (DataAbsen["jenis_absen"] == "1") {
+      if (DataAbsen == null) {
         statusWF = 1;
         KeteranganMulai = "Jam Presensi Datang";
         KeteranganSelesai = "Jam Presensi Pulang";
-      } else if (DataAbsen["jenis_absen"] == "4") {
-        statusWF = 4;
-        KeteranganMulai = "Jam Presensi Mulai WFH";
-        KeteranganSelesai = "Jam Presensi Selesai WFH";
+
+        // if (DataAbsen["jenis_absen"] == "1") {
+        //   statusWF = 1;
+        //   KeteranganMulai = "Jam Presensi Datang";
+        //   KeteranganSelesai = "Jam Presensi Pulang";
+        // } else if (DataAbsen["jenis_absen"] == "4") {
+        //   statusWF = 4;
+        //   KeteranganMulai = "Jam Presensi Mulai WFH";
+        //   KeteranganSelesai = "Jam Presensi Selesai WFH";
+        // }
       }
       if (DataAbsenPulang != null) {
         jam_pulang = formatDate(
@@ -567,7 +573,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             " s/d " +
             formatDate(DateTime.parse(DataSelesaiIstirahat['waktu']),
                 [HH, ':', nn, ':', ss]);
-      } else {
+      } else if (DataIstirahat != null) {
         jam_istirahat = formatDate(DateTime.parse(DataIstirahat['waktu']),
                 [HH, ':', nn, ':', ss]) +
             " - Belum Presensi";
@@ -2048,12 +2054,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   Navigator.of(context).pop();
                 },
               ),
-              TextButton(
-                child: Text('Perbarui Sekarang'),
-                onPressed: () {
-                  LaunchReview.launch();
-                },
-              )
+              // TextButton(
+              //   child: Text('Perbarui Sekarang'),
+              //   onPressed: () {
+              //     LaunchReview.launch();
+              //   },
+              // )
             ],
           ),
         );

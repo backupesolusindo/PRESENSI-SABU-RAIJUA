@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/config/palette.dart';
+import 'package:presensi_sabu_raijua/config/palette.dart';
 
 // icon app bar
 class CustomAppBar extends StatelessWidget {

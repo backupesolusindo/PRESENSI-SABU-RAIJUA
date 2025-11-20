@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/Camera/components/body.dart';
+import 'package:presensi_sabu_raijua/Screens/Camera/components/body.dart';
 
 class CameraScreen extends StatelessWidget {
   @override

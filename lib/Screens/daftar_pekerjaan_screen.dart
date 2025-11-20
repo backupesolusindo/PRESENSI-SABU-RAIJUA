@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
 
 class DaftarPekerjaanBottomSheet extends StatelessWidget {
   final List dataPekerjaan;
-    final Future<void> Function(Map) onAddPekerjaan;
-    
+  final Future<void> Function(Map) onAddPekerjaan;
 
   const DaftarPekerjaanBottomSheet({
     Key? key,
@@ -90,108 +89,105 @@ class DaftarPekerjaanBottomSheet extends StatelessWidget {
                       ],
                     ),
                     trailing: IconButton(
-                    icon: Icon(
-                      Icons.add_circle,
-                      color: kPrimaryColor,
-                      size: 35,
-                    ),
-                    onPressed: () async {
-                      await _showAddConfirmation(context, pekerjaan);
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-
-
-  Future<void> _showAddConfirmation(BuildContext context, Map pekerjaan) async {
-  bool? result = await showDialog<bool>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        title: Text(
-          "Tambah Pekerjaan",
-          style: TextStyle(
-            color: kPrimaryColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Apakah Anda ingin menambahkan pekerjaan berikut:",
-              style: TextStyle(color: Colors.grey[700]),
-            ),
-            SizedBox(height: 15),
-            Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    pekerjaan['nama_pekerjaan'],
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      icon: Icon(
+                        Icons.add_circle,
+                        color: kPrimaryColor,
+                        size: 35,
+                      ),
+                      onPressed: () async {
+                        await _showAddConfirmation(context, pekerjaan);
+                      },
                     ),
                   ),
-                  SizedBox(height: 5),
-                  Text("Point: ${pekerjaan['point']}"),
-                  Text(
-                    "Tipe: ${pekerjaan['tipe_pekerjaan'] == '0' ? 'Fleksibel' : 'Harian'}",
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            child: Text(
-              "Batal",
-              style: TextStyle(color: Colors.grey),
-            ),
-            onPressed: () => Navigator.of(context).pop(false),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            child: Text("Tambah"),
-            onPressed: () => Navigator.of(context).pop(true),
           ),
         ],
-      );
-    },
-  );
+      ),
+    );
+  }
 
-  if (result == true) {
-    Navigator.pop(context); // Tutup bottom sheet
-    try {
-      await onAddPekerjaan(pekerjaan);
-    } catch (e) {
-      print("Error adding pekerjaan: $e");
+  Future<void> _showAddConfirmation(BuildContext context, Map pekerjaan) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Text(
+            "Tambah Pekerjaan",
+            style: TextStyle(
+              color: kPrimaryColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Apakah Anda ingin menambahkan pekerjaan berikut:",
+                style: TextStyle(color: Colors.grey[700]),
+              ),
+              SizedBox(height: 15),
+              Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      pekerjaan['nama_pekerjaan'],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text("Point: ${pekerjaan['point']}"),
+                    Text(
+                      "Tipe: ${pekerjaan['tipe_pekerjaan'] == '0' ? 'Fleksibel' : 'Harian'}",
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                "Batal",
+                style: TextStyle(color: Colors.grey),
+              ),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Text("Tambah"),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      Navigator.pop(context); // Tutup bottom sheet
+      try {
+        await onAddPekerjaan(pekerjaan);
+      } catch (e) {
+        print("Error adding pekerjaan: $e");
+      }
     }
   }
 }
-}
-  

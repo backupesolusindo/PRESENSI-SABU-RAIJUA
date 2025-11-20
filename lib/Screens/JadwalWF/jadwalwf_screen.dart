@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/JadwalWF/components/body.dart';
+import 'package:presensi_sabu_raijua/Screens/JadwalWF/components/body.dart';
 
 class JadwalWFScreenn extends StatelessWidget {
   @override

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/constants.dart';
-import 'package:mobile_presensi_kdtg/core.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
+import 'package:presensi_sabu_raijua/core.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,8 +66,7 @@ class _StatsGridState extends State<StatsGrid> {
       child: Column(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(
-                left: 12.0, top: 40.0),
+            padding: EdgeInsets.only(left: 12.0, top: 40.0),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(

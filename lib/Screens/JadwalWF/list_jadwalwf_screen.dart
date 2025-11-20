@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/JadwalWF/ListJadwalWF/body.dart';
+import 'package:presensi_sabu_raijua/Screens/JadwalWF/ListJadwalWF/body.dart';
 
 class ListJadwalWF_Screen extends StatefulWidget {
   @override

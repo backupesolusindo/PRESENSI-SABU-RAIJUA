@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_presensi_kdtg/Screens/ResetPassword/components/background.dart';
-import 'package:mobile_presensi_kdtg/Screens/ResetPassword/post_reset.dart';
-import 'package:mobile_presensi_kdtg/components/rounded_button.dart';
-import 'package:mobile_presensi_kdtg/components/rounded_password_field.dart';
+import 'package:presensi_sabu_raijua/Screens/ResetPassword/components/background.dart';
+import 'package:presensi_sabu_raijua/Screens/ResetPassword/post_reset.dart';
+import 'package:presensi_sabu_raijua/components/rounded_button.dart';
+import 'package:presensi_sabu_raijua/components/rounded_password_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatefulWidget {
