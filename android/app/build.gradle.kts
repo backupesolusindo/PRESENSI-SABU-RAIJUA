@@ -17,7 +17,7 @@ if (keystorePropertiesFile.exists()) {
 
 
 android {
-    namespace = "com.presensi_sabu_raijua"
+    namespace = "com.esolusindo.presensi_saburaijua"
     compileSdk = 36
     ndkVersion = "27.0.12077973"
 
@@ -32,7 +32,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.presensi_sabu_raijua"
+        applicationId = "com.esolusindo.presensi_saburaijua"
         minSdk = 26  
         targetSdk = 36
         versionCode = flutter.versionCode
@@ -51,7 +51,18 @@ android {
             create("release") {
                 keyAlias = keystoreProperties.getProperty("keyAlias")
                 keyPassword = keystoreProperties.getProperty("keyPassword")
-                storeFile = keystoreProperties.getProperty("storeFile")?.let { file(it) }
+                storeFile = keystoreProperties.getProperty("storeFile")?.let { 
+                    // Handle path relatif dari android/ directory
+                    when {
+                        it.startsWith("../") -> {
+                            // Path relatif ke root project (../../ dari android/)
+                            val fileName = it.substringAfterLast("/")
+                            rootProject.rootDir.parentFile.resolve(fileName)
+                        }
+                        it.startsWith("/") -> file(it) // Absolute path
+                        else -> rootProject.file(it) // Path relatif dari android/
+                    }
+                }
                 storePassword = keystoreProperties.getProperty("storePassword")
             }
         }
@@ -76,6 +87,19 @@ android {
         getByName("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
+        }
+    }
+
+    // Konfigurasi untuk Android App Bundle (AAB)
+    bundle {
+        language {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
         }
     }
 }

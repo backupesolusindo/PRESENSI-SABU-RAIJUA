@@ -1,4 +1,4 @@
-package com.presensi_sabu_raijua
+package com.esolusindo.presensi_saburaijua
 
 import io.flutter.embedding.android.FlutterActivity
 
