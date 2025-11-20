@@ -126,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _getMockLocation() async {
-    Timer(Duration(seconds: 2), () => _Cek_Login());
+    Timer(Duration(milliseconds: 1500), () => _Cek_Login());
     // bool _mocklocation = await TrustLocation.isMockLocation;
     // print(_mocklocation);
     // if (_mocklocation == true) {
