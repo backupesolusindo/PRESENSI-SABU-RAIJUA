@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:presensi_sabu_raijua/Screens/Profil/profil_user.dart';
 import 'package:presensi_sabu_raijua/Screens/screens.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
 
 class BottomNavScreen extends StatefulWidget {
   @override
@@ -45,7 +46,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: _currentIndex == key
-                                ? Theme.of(context).primaryColor
+                                ? kSecondaryColor
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(20.0),
                           ),
