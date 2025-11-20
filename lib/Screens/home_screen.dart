@@ -265,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
             ],
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: const Color(0xFFF2BB4D),
           duration: Duration(seconds: 2),
         ),
       );
@@ -363,7 +363,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text("Jumlah harus diisi!"),
-                          backgroundColor: Colors.red,
+                          backgroundColor: const Color(0xFFF2BB4D),
                         ),
                       );
                       return;
@@ -470,7 +470,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               Text("Gagal mengupdate status pekerjaan"),
             ],
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: const Color(0xFFF2BB4D),
           duration: Duration(seconds: 2),
         ),
       );
@@ -729,7 +729,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         ),
                         child: Icon(
                           Icons.workspace_premium,
-                          color: Colors.amber,
+                          color: Colors.white,
                           size: 25,
                         ),
                       ),
@@ -747,7 +747,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         children: [
                           Icon(
                             Icons.star,
-                            color: Colors.amber,
+                            color: Colors.white,
                             size: 24,
                           ),
                           SizedBox(width: 5),
@@ -1327,7 +1327,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             image: Foto.isNotEmpty && Foto.startsWith('http')
                                 ? NetworkImage(Core().Url + Foto)
                                     as ImageProvider
-                                : AssetImage('assets/images/logo.png')
+                                : AssetImage(
+                                        'assets/images/Lambang_Kabupaten_Sabu_Raijua.png')
                                     as ImageProvider,
                           ),
                         ),
@@ -1370,21 +1371,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
+                    // Card Waktu dan Tanggal
                     Expanded(
                       child: Container(
                         height: 125,
-                        width: size.width * 0.43,
-                        margin: EdgeInsets.only(right: 4),
+                        margin: EdgeInsets.only(right: 8),
                         padding:
                             EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white70,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(12.0),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white70,
-                              blurRadius: 4,
-                              offset: Offset(4, 4), // Shadow position
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 6,
+                              offset: Offset(0, 3),
                             ),
                           ],
                         ),
@@ -1394,85 +1396,96 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             Icon(
                               Icons.watch_later_outlined,
                               color: Colors.blue,
+                              size: 28,
                             ),
+                            SizedBox(height: 6),
                             Text(
                               jam,
                               style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w500,
-                                  color: CText),
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                                color: CText,
+                              ),
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
+                            SizedBox(height: 3),
                             Text(
                               formatDate(DateTime.now(),
                                   [D, ', ', dd, ' ', MM, ' ', yyyy]),
+                              textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: CText),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: CText.withOpacity(0.7),
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
+
+                    // Card Lokasi (Clickable)
                     Expanded(
-                      child: TextButton(
-                          onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return LokasiKampusScreen();
-                            }));
-                          },
-                          child: Container(
-                            height: 125,
-                            width: size.width * 0.43,
-                            margin: EdgeInsets.only(left: 4),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 18, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: Colors.white70,
-                              borderRadius: BorderRadius.circular(12.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.white70,
-                                  blurRadius: 4,
-                                  offset: Offset(4, 4), // Shadow position
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return LokasiKampusScreen();
+                          }));
+                        },
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: Container(
+                          height: 125,
+                          margin: EdgeInsets.only(left: 8),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 1,
+                                blurRadius: 6,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Icon(
+                                Icons.location_on_outlined,
+                                color: Colors.blue,
+                                size: 32,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                LokasiAnda,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: CText,
                                 ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Icon(
-                                  Icons.location_on_outlined,
-                                  color: Colors.blue,
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                "Lokasi Anda",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: CText.withOpacity(0.7),
                                 ),
-                                Text(
-                                  LokasiAnda,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      color: CText),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  "Lokasi Anda",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: CText),
-                                ),
-                              ],
-                            ),
-                          )),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     )
                   ],
-                ),
+                )
               ],
             )
           ],
