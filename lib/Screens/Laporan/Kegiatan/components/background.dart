@@ -18,22 +18,22 @@ class Background extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: Image.asset(
-              "assets/images/main_bottom_right.png",
-              width: size.width * 0.25,
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            child: Image.asset(
-              "assets/images/main_bottom_left.png",
-              width: size.width * 0.25,
-            ),
-          ),
+          // Positioned(
+          //   bottom: 0,
+          //   right: 0,
+          //   child: Image.asset(
+          //     "assets/images/main_bottom_right.png",
+          //     width: size.width * 0.25,
+          //   ),
+          // ),
+          // Positioned(
+          //   bottom: 0,
+          //   left: 0,
+          //   child: Image.asset(
+          //     "assets/images/main_bottom_left.png",
+          //     width: size.width * 0.25,
+          //   ),
+          // ),
           Column(
             children: <Widget>[
               filter,

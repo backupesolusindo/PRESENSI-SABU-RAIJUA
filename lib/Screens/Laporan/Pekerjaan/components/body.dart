@@ -58,43 +58,78 @@ class _Body extends State<Body> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String uuid = prefs.getString("ID") ?? "";
 
+      print("=== DEBUG START ===");
+      print("UUID: $uuid");
+
       // Fetch pekerjaan data
       var urlPekerjaan = Uri.parse(Core().ApiUrl + "Pekerjaan/get_pekerjaan");
+      print("URL Pekerjaan: $urlPekerjaan");
+
       var responsePekerjaan = await http.get(urlPekerjaan);
+      print("Status Pekerjaan: ${responsePekerjaan.statusCode}");
+      print("Response Pekerjaan: ${responsePekerjaan.body}");
+
       if (responsePekerjaan.statusCode == 200) {
         var dataPekerjaanJson = json.decode(responsePekerjaan.body);
-        dataPekerjaan = dataPekerjaanJson['data'];
+        dataPekerjaan = dataPekerjaanJson['data'] ?? [];
+        print("Jumlah data pekerjaan: ${dataPekerjaan.length}");
       }
 
       // Fetch riwayat
       var url = Uri.parse(Core().ApiUrl + "riwayatPekerjaan/get_riwayat");
+      print("URL Riwayat: $url");
+
       var response = await http.post(url, body: {
         "pegawai_idpegawai": uuid,
       });
 
+      print("Status Riwayat: ${response.statusCode}");
+      print("Response Riwayat: ${response.body}");
+
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(response.body);
-        var filteredData = jsonResponse['data']
-            .where((item) => item['pegawai_idpegawai'] == uuid)
-            .toList();
+        print("JSON Response: $jsonResponse");
+
+        var allData = jsonResponse['data'] ?? [];
+        print("Total data sebelum filter: ${allData.length}");
+
+        var filteredData =
+            allData.where((item) => item['pegawai_idpegawai'] == uuid).toList();
+
+        print("Data setelah filter UUID: ${filteredData.length}");
 
         // Filter berdasarkan status
         if (statusFilter.isNotEmpty) {
           filteredData = filteredData
               .where((item) => item['status'] == statusFilter)
               .toList();
+          print(
+              "Data setelah filter status '$statusFilter': ${filteredData.length}");
         }
 
         setState(() {
           riwayatPekerjaan = filteredData;
           isLoading = false;
         });
+
+        print("=== DEBUG END ===");
+      } else {
+        print("Error: Status code bukan 200");
+        setState(() {
+          isLoading = false;
+        });
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print("Error fetching data: $e");
+      print("Stack trace: $stackTrace");
       setState(() {
         isLoading = false;
       });
+
+      // Tampilkan error ke user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Gagal memuat data: $e")),
+      );
     }
   }
 
