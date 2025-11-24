@@ -25,6 +25,7 @@ import 'package:presensi_sabu_raijua/Screens/LokasiKampus/lokasi_kampus_screen.d
 import 'package:presensi_sabu_raijua/Screens/Perizinan/izin_screen.dart';
 import 'package:presensi_sabu_raijua/Screens/Profil/profil_user.dart';
 import 'package:presensi_sabu_raijua/Screens/ResetPassword/reset_password.dart';
+import 'package:presensi_sabu_raijua/constants.dart';
 import 'package:presensi_sabu_raijua/core.dart';
 import 'package:presensi_sabu_raijua/components/or_divider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -112,9 +113,6 @@ class _SemuaMenu extends State<SemuaMenu> {
       appBar: AppBar(
         title: Text(
           "Semua Menu",
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
-          ),
         ),
         leading: GestureDetector(
           onTap: () {
@@ -122,7 +120,6 @@ class _SemuaMenu extends State<SemuaMenu> {
           },
           child: Icon(
             Icons.arrow_back_ios_rounded,
-            color: Colors.white, // add custom icons also
           ),
         ),
       ),
@@ -150,7 +147,7 @@ class _SemuaMenu extends State<SemuaMenu> {
               'Menu Presensi',
               style: const TextStyle(
                 fontSize: 15.0,
-                color: Colors.lightBlue,
+                color: kPrimaryColor,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -548,7 +545,7 @@ class _SemuaMenu extends State<SemuaMenu> {
               'Menu Cuti',
               style: const TextStyle(
                 fontSize: 15.0,
-                color: Colors.lightBlue,
+                color: kPrimaryColor,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -603,7 +600,7 @@ class _SemuaMenu extends State<SemuaMenu> {
   //             'Menu Laporan',
   //             style: const TextStyle(
   //               fontSize: 15.0,
-  //               color: Colors.lightBlue,
+  //               color: kPrimaryColor,
   //               fontWeight: FontWeight.w600,
   //             ),
   //           ),
@@ -770,7 +767,7 @@ class _SemuaMenu extends State<SemuaMenu> {
               'Menu Laporan',
               style: const TextStyle(
                 fontSize: 15.0,
-                color: Colors.lightBlue,
+                color: kPrimaryColor,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -863,7 +860,7 @@ class _SemuaMenu extends State<SemuaMenu> {
               'Menu Profil User',
               style: const TextStyle(
                 fontSize: 15.0,
-                color: Colors.lightBlue,
+                color: kPrimaryColor,
                 fontWeight: FontWeight.w600,
               ),
             ),
