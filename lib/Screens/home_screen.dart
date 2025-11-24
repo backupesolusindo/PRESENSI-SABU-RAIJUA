@@ -631,10 +631,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
               Positioned(
                 bottom: 0,
-                left: 0,
+                right: 0,
                 child: Image.asset(
                   "assets/images/dash_bl.png",
-                  width: size.width,
+                  width: size.width * 0.6,
                   fit: BoxFit.fill,
                 ),
               ),
@@ -1305,7 +1305,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white70,
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/corner.png'),
+                      fit: BoxFit
+                          .fill, // atur jadi cover/contain/repeat sesuai kebutuhan
+                      alignment: Alignment.topCenter,
+                    ),
                     borderRadius: BorderRadius.circular(12.0),
                     boxShadow: [
                       BoxShadow(
@@ -1317,32 +1322,33 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   child: Row(
                     children: <Widget>[
-                      Container(
-                        height: 59,
-                        width: 59,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: Foto.isNotEmpty && Foto.startsWith('http')
-                                ? NetworkImage(Core().Url + Foto)
-                                    as ImageProvider
-                                : AssetImage(
-                                        'assets/images/Lambang_Kabupaten_Sabu_Raijua.png')
-                                    as ImageProvider,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
+                          Container(
+                            height: 59,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              image: DecorationImage(
+                                fit: BoxFit.fill,
+                                image: Foto.isNotEmpty &&
+                                        Foto.startsWith('http')
+                                    ? NetworkImage(Core().Url + Foto)
+                                        as ImageProvider
+                                    : AssetImage(
+                                            'assets/images/Lambang_Kabupaten_Sabu_Raijua.png')
+                                        as ImageProvider,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
                           Text(
-                            "Good Day!",
+                            "Selamat Bekerja!",
                             style: TextStyle(
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w500,
                                 color: CText),
                           ),
@@ -1354,7 +1360,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 color: CText),
                           ),
                           Text(
-                            (NIP == "") ? "-" : NIP,
+                            (NIP == "") ? "Tidak ada NIP" : "NIP : " + NIP,
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
@@ -1362,6 +1368,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           )
                         ],
                       ),
+                      Expanded(
+                        flex: 1,
+                        child: SizedBox(
+                          height: 50,
+                        ),
+                      ),
+                      Container(
+                        child: Row(children: <Widget>[
+                          Image.asset(
+                            "assets/images/bupati_sabu_raijua.png",
+                            height: 120,
+                            width: 80,
+                          ),
+                          Image.asset(
+                            "assets/images/wakil_bupati_sabu_raijua.png",
+                            height: 120,
+                            width: 80,
+                          ),
+                        ]),
+                      )
                     ],
                   ),
                 ),
@@ -1395,7 +1421,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           children: <Widget>[
                             Icon(
                               Icons.watch_later_outlined,
-                              color: Colors.blue,
+                              color: kPrimaryColor,
                               size: 28,
                             ),
                             SizedBox(height: 6),
@@ -1455,7 +1481,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             children: <Widget>[
                               Icon(
                                 Icons.location_on_outlined,
-                                color: Colors.blue,
+                                color: kPrimaryColor,
                                 size: 32,
                               ),
                               SizedBox(height: 8),
