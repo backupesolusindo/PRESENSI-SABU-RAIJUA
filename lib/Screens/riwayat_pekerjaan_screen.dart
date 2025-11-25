@@ -41,6 +41,21 @@ class _RiwayatPekerjaanScreenState extends State<RiwayatPekerjaanScreen> {
     }
   }
 
+  String _getStatusText(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'PENGERJAAN';
+      case 'complete':
+        return 'SELESAI';
+      case 'approve':
+        return 'APPROVE';
+      case 'reject':
+        return 'DITOLAK';
+      default:
+        return 'Tanpa Keterangan';
+    }
+  }
+
   void _showUpdateConfirmation(Map riwayat, Map pekerjaan) {
     showDialog(
       context: context,
@@ -63,7 +78,7 @@ class _RiwayatPekerjaanScreenState extends State<RiwayatPekerjaanScreen> {
               Text(
                 pekerjaan['tipe_pekerjaan'] == "0"
                     ? "Apakah Anda yakin ingin menyelesaikan pekerjaan ini?"
-                    : "Anda akan diminta memasukkan jumlah setelah ini. Lanjutkan?",
+                    : "Anda akan diminta memasukkan jumlah hasil kerja. Lanjutkan?",
                 style: TextStyle(color: Colors.grey[700]),
               ),
               SizedBox(height: 15),
@@ -108,7 +123,7 @@ class _RiwayatPekerjaanScreenState extends State<RiwayatPekerjaanScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              child: Text("Update"),
+              child: Text("Selesaikan"),
               onPressed: () async {
                 Navigator.of(context).pop();
                 await widget.onUpdateStatus(
@@ -249,7 +264,7 @@ class _RiwayatPekerjaanScreenState extends State<RiwayatPekerjaanScreen> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                riwayat['status'].toUpperCase(),
+                                _getStatusText(riwayat['status']),
                                 style: TextStyle(
                                   color: _getStatusColor(riwayat['status']),
                                   fontWeight: FontWeight.bold,
@@ -365,17 +380,32 @@ class _RiwayatPekerjaanScreenState extends State<RiwayatPekerjaanScreen> {
                           ],
                         ),
                         trailing: riwayat['status'] == 'pending'
-                            ? IconButton(
-                                icon: Icon(
-                                  Icons.check_circle_outline,
-                                  color: Colors.green,
-                                  size: 35,
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 5,
+                                      offset: Offset(1, 3),
+                                    ),
+                                  ],
                                 ),
-                                onPressed: () {
-                                  if (pekerjaan != null) {
-                                    _showUpdateConfirmation(riwayat, pekerjaan);
-                                  }
-                                },
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.check_circle_outline,
+                                    color: Colors.green,
+                                    size: 35,
+                                  ),
+                                  onPressed: () {
+                                    if (pekerjaan != null) {
+                                      _showUpdateConfirmation(
+                                          riwayat, pekerjaan);
+                                    }
+                                  },
+                                ),
                               )
                             : Icon(
                                 Icons.check_circle,
